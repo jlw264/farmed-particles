@@ -25,8 +25,8 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   using Address for address payable;
   using Counters for Counters.Counter;
 
-  uint256 constant FULL_CHARGE_THRESHOLD = 2;
-  uint256 constant HALF_CHARGE_THRESHOLD = 1;
+  uint256 internal _fullHarvestThreshold = 2;
+  uint256 internal _halfHarvestThreshold = 1;
 
   enum Status {
     Empty,
@@ -87,6 +87,14 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
 
   function getCreatorAnnuityPercent() external view virtual override returns (uint256) {
     return _farmCreatorAnnuityPercent;
+  }
+
+  function getFullHarvestThreshold() external view virtual returns (uint256) {
+    return _fullHarvestThreshold;
+  }
+
+  function getHalfHarvestThreshold() external view virtual returns (uint256) {
+    return _halfHarvestThreshold;
   }
 
   // TODO - figure out how to make TokenURI dynamic
@@ -169,17 +177,17 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     uint256 chargeUni = getChargeAaveUni(tokenId);
     uint256 chargeUsdt = getChargeAaveUsdt(tokenId);
 
-    if (chargeDai > FULL_CHARGE_THRESHOLD) {
+    if (chargeDai > _fullHarvestThreshold) {
       return Status.FullDai;
-    } else if (chargeUni > FULL_CHARGE_THRESHOLD) {
+    } else if (chargeUni > _fullHarvestThreshold) {
       return Status.FullUni;
-    } else if (chargeUsdt > FULL_CHARGE_THRESHOLD) {
+    } else if (chargeUsdt > _fullHarvestThreshold) {
       return Status.FullUsdt;
-    } else if (chargeDai > HALF_CHARGE_THRESHOLD) {
+    } else if (chargeDai > _halfHarvestThreshold) {
       return Status.HalfDai;
-    } else if (chargeUni > HALF_CHARGE_THRESHOLD) {
+    } else if (chargeUni > _halfHarvestThreshold) {
       return Status.HalfUni;
-    } else if (chargeUsdt > HALF_CHARGE_THRESHOLD) {
+    } else if (chargeUsdt > _halfHarvestThreshold) {
       return Status.HalfUsdt;
     }
     
@@ -335,6 +343,15 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     _statusToTokenURI[Status.FullDai] = fullDaiUri;
     _statusToTokenURI[Status.FullUni] = fullUniUri;
     _statusToTokenURI[Status.FullUsdt] = fullUsdtUri;
+  }
+
+  function setHarvestThresholds(uint256 fullThreshold, uint256 halfThreshold) 
+    external 
+    virtual
+    onlyOwner
+  {
+    _fullHarvestThreshold = fullThreshold;
+    _halfHarvestThreshold = halfThreshold;
   }
 
   /***********************************|

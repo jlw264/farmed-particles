@@ -21,7 +21,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "localhost";
+const defaultNetwork = "localhost";//"kovan"
 
 function mnemonic() {
   try {
@@ -51,50 +51,50 @@ module.exports = {
         (you can put in a mnemonic here to set the deployer locally)
       */
     },
-    rinkeby: {
-      url: "https://rinkeby.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
+    // rinkeby: {
+    //   url: "https://rinkeby.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
+    //   accounts: {
+    //     mnemonic: mnemonic(),
+    //   },
+    // },
     kovan: {
-      url: "https://kovan.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
+      url: "https://kovan.infura.io/v3/4a64945c952742fe8a47d0e14761e7ad",
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: mnemonic()
       },
     },
-    mainnet: {
-      url: "https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
-    ropsten: {
-      url: "https://ropsten.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
-    goerli: {
-      url: "https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
-    xdai: {
-      url: 'https://rpc.xdaichain.com/',
-      gasPrice: 1000000000,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
-    matic: {
-      url: 'https://rpc-mainnet.maticvigil.com/',
-      gasPrice: 1000000000,
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
+    // mainnet: {
+    //   url: "https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
+    //   accounts: {
+    //     mnemonic: mnemonic(),
+    //   },
+    // },
+    // ropsten: {
+    //   url: "https://ropsten.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
+    //   accounts: {
+    //     mnemonic: mnemonic(),
+    //   },
+    // },
+    // goerli: {
+    //   url: "https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", //<---- YOUR INFURA ID! (or it won't work)
+    //   accounts: {
+    //     mnemonic: mnemonic(),
+    //   },
+    // },
+    // xdai: {
+    //   url: 'https://rpc.xdaichain.com/',
+    //   gasPrice: 1000000000,
+    //   accounts: {
+    //     mnemonic: mnemonic(),
+    //   },
+    // },
+    // matic: {
+    //   url: 'https://rpc-mainnet.maticvigil.com/',
+    //   gasPrice: 1000000000,
+    //   accounts: {
+    //     mnemonic: mnemonic(),
+    //   },
+    // },
   },
   solidity: {
     compilers: [
@@ -131,11 +131,11 @@ module.exports = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: "PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8"
+    apiKey: "JQ72R44NYEXSJQW4UJ32N51YW9UC3YW7JF"
   }
 };
 
-const DEBUG = false;
+const DEBUG = true;
 
 function debug(text) {
   if (DEBUG) {
@@ -279,7 +279,7 @@ task("account", "Get balance informations for the deployment account.", async (_
   if (DEBUG) console.log("seed", seed)
   const hdwallet = hdkey.fromMasterSeed(seed);
   const wallet_hdpath = "m/44'/60'/0'/0/";
-  const account_index = 0
+  const account_index = 2 //0
   let fullPath = wallet_hdpath + account_index
   if (DEBUG) console.log("fullPath", fullPath)
   const wallet = hdwallet.derivePath(fullPath).getWallet();
