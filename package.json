@@ -66,6 +66,7 @@
     "@opengsn/gsn": "^2.1.0",
     "@openzeppelin/contracts": "^3.4.1",
     "@openzeppelin/contracts-upgradeable": "^3.4.1",
+    "nft.storage": "^0.3.8",
     "openzeppelin-solidity": "^3.4.1"
   }
 }

@@ -21,11 +21,14 @@ const main = async () => {
   }
   console.log(" \n")
 
+  const creatorAddressKovan = "0x3a5098C1dce83D2DAe00719f63e17e6447a13023";
+  const creatorAnnuity = 5;
+
   // deploy the contract with all the artworks forSale
   // const yourCollectible = await deploy("YourCollectible",[ bytes32Array ]) // <-- add in constructor args like line 19 vvvv
 
   //const yourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
-  const secondContract = await deploy("FarmedParticle", ["0xE146F04b0B5A99A35D4B25edf5AD8aa8d26D96b9", 2])
+  const farmedParticleContract = await deploy("FarmedParticle", [creatorAddressKovan, creatorAnnuity])
 
   // const exampleToken = await deploy("ExampleToken")
   // const examplePriceOracle = await deploy("ExamplePriceOracle")
@@ -70,8 +73,8 @@ const main = async () => {
   /*
   console.log(chalk.blue('verifying on etherscan'))
   await run("verify:verify", {
-    address: yourContract.address,
-    // constructorArguments: args // If your contract has constructor arguments, you can pass them as an array
+    address: farmedParticleContract.address,
+    constructorArguments: [creatorAddressKovan, creatorAnnuity] // If your contract has constructor arguments, you can pass them as an array
   })
   */
 

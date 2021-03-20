@@ -3105,6 +3105,45 @@
     "@walletconnect/utils" "^1.3.6"
     web3-provider-engine "16.0.1"
 
+"@web-std/blob@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@web-std/blob/-/blob-2.0.0.tgz#603af17bd5996590daba6b65795acb5206571728"
+  integrity sha512-i4JdX5sli14KQra9wYo2a/wap5SICp4c20EdGTzPDxUbXLPrPIsH5IplUizKeBXNRAtxKDenp+kCNukVs3FyNA==
+  dependencies:
+    web-encoding "1.1.0"
+    web-streams-polyfill "2.1.1"
+
+"@web-std/blob@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@web-std/blob/-/blob-2.0.1.tgz#ecf95e0a9696cc95721a8659b9bd67ea705ef97f"
+  integrity sha512-eyRgoKhJQ6BYEpMeO4hJNKKwpcS1NYqJy5Mw69mgmjUDsu8bCKn7L5JUTXL+T3z3QpgISOJsboX2UchRyTxd/A==
+  dependencies:
+    web-encoding "1.1.0"
+    web-streams-polyfill "2.1.1"
+
+"@web-std/fetch@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@web-std/fetch/-/fetch-1.0.0.tgz#c3346d6d4ec4cf8563365ca3d6ec5f052ac0f06e"
+  integrity sha512-ghp1XUrJf1Ue4hSMC5In6b1osL+iYmyqIFNS4c/3sIsBjX3j6doWG1hXCEQYk88OwXLbSzAIc6q0mBnIbkUVjg==
+  dependencies:
+    data-uri-to-buffer "^3.0.1"
+    fetch-blob "^2.1.1"
+
+"@web-std/file@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@web-std/file/-/file-1.0.1.tgz#75db92071574e893ad66bdc1d282db97a6dfb89d"
+  integrity sha512-XAgUci2QDWb+HLtZnujP4kBmW4aYGYHAVimN4hn6tK0tMKsZi3e1teguy/e2ZXdimvrXMq8Dt9UPHUdRcY28iQ==
+  dependencies:
+    "@web-std/blob" "2.0.0"
+
+"@web-std/form-data@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@web-std/form-data/-/form-data-2.0.0.tgz#15553cc573aff0e030ef9dfb5bd4128ed74bf7a7"
+  integrity sha512-zgLBe6QZUhl3Mk0jKJ9vWLdv9sykq7lVRHazQyJw4fZOVYltJ4WdJsxC+Jd2br+qkWJTppNORzyMK/0ayy4AOw==
+  dependencies:
+    web-encoding "1.1.0"
+    web-streams-polyfill "2.1.1"
+
 "@web3-js/scrypt-shim@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@web3-js/scrypt-shim/-/scrypt-shim-0.1.0.tgz#0bf7529ab6788311d3e07586f7d89107c3bea2cc"
@@ -3320,6 +3359,11 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"
   integrity sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==
+
+"@zxing/text-encoding@0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@zxing/text-encoding/-/text-encoding-0.9.0.tgz#fb50ffabc6c7c66a0c96b4c03e3d9be74864b70b"
+  integrity sha512-U/4aVJ2mxI0aDNI8Uq0wEhMgY+u4CNtEb0om3+y3+niDAsoTCOB33UF0sxpzqzdqXLqmvc+vZyAt4O8pPdfkwA==
 
 JSONStream@1.3.2:
   version "1.3.2"
@@ -6903,6 +6947,11 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
+data-uri-to-buffer@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-3.0.1.tgz#594b8973938c5bc2c33046535785341abc4f3636"
+  integrity sha512-WboRycPNsVw3B3TL559F7kuBUM4d8CgMEvk6xEJlOp7OBPjt6G7z8WMWlD2rOFZLk6OYfFIUGsCOWzcQH9K2og==
+
 data-urls@^1.0.0, data-urls@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/data-urls/-/data-urls-1.1.0.tgz#15ee0582baa5e22bb59c77140da8f9c76963bbfe"
@@ -9216,6 +9265,11 @@ fecha@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.0.tgz#3ffb6395453e3f3efff850404f0a59b6747f5f41"
   integrity sha512-aN3pcx/DSmtyoovUudctc8+6Hl4T+hI9GBBHLjA76jdZl7+b1sgh5g4k+u/GL3dTy1/pnYzKp69FpJ0OicE3Wg==
+
+fetch-blob@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-2.1.1.tgz#a54ab0d5ed7ccdb0691db77b6674308b23fb2237"
+  integrity sha512-Uf+gxPCe1hTOFXwkxYyckn8iUSk6CFXGy5VENZKifovUTZC9eUODWSBhOBS7zICGrAetKzdwLMr85KhIcePMAQ==
 
 fetch-ponyfill@^4.0.0:
   version "4.1.0"
@@ -14496,6 +14550,16 @@ next-tick@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
+
+nft.storage@^0.3.8:
+  version "0.3.8"
+  resolved "https://registry.yarnpkg.com/nft.storage/-/nft.storage-0.3.8.tgz#2b13a09a937faeda4db03555833a54530e38fceb"
+  integrity sha512-sVQhfyGuKixK1otUunYvVoN5LiWUluXo5/L3EkfApc2Axxq2EPeAPC7u+GChoYceZJzExPlUejRgj0+fRAZAxA==
+  dependencies:
+    "@web-std/blob" "2.0.1"
+    "@web-std/fetch" "1.0.0"
+    "@web-std/file" "1.0.1"
+    "@web-std/form-data" "2.0.0"
 
 nice-try@^1.0.4:
   version "1.0.5"
@@ -20714,6 +20778,18 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
+web-encoding@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/web-encoding/-/web-encoding-1.1.0.tgz#b8ed50f0e23ba239542ba11ebe885b75a0b95bea"
+  integrity sha512-KzYonGdJnZB3qvhK8hKca5qXk/wp+hgwGNTY1TnqtF2CzDzpN8szOC3ejhX9+wbhCq3vQs/TjM8BykS1kor0lQ==
+  optionalDependencies:
+    "@zxing/text-encoding" "0.9.0"
+
+web-streams-polyfill@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-2.1.1.tgz#2c82b6193849ccb9efaa267772c28260ef68d6d2"
+  integrity sha512-dlNpL2aab3g8CKfGz6rl8FNmGaRWLLn2g/DtSc9IjB30mEdE6XxzPfPSig5BwGSzI+oLxHyETrQGKjrVVhbLCg==
+
 web3-bzz@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/web3-bzz/-/web3-bzz-1.2.1.tgz#c3bd1e8f0c02a13cd6d4e3c3e9e1713f144f6f0d"
@@ -21489,9 +21565,9 @@ web3-provider-engine@^15.0.7:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-"web3-provider-engine@git+https://github.com/trufflesuite/provider-engine.git#web3-one":
+"web3-provider-engine@https://github.com/trufflesuite/provider-engine#web3-one":
   version "14.0.6"
-  resolved "git+https://github.com/trufflesuite/provider-engine.git#9694f5b4e5500651bd2ff689df8529bb5cf6b96f"
+  resolved "https://github.com/trufflesuite/provider-engine#9694f5b4e5500651bd2ff689df8529bb5cf6b96f"
   dependencies:
     async "^2.5.0"
     backoff "^2.5.0"

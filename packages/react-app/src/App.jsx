@@ -168,11 +168,11 @@ function App(props) {
 
 
   // keep track of a variable from the contract in the local React state:
-  const balance = useContractReader(readContracts,"YourCollectible", "balanceOf", [ address ])
+  const balance = useContractReader(readContracts,"FarmedParticle", "balanceOf", [ address ])
   console.log("🤗 balance:",balance)
 
   //📟 Listen for broadcast events
-  const transferEvents = useEventListener(readContracts, "YourCollectible", "Transfer", localProvider, 1);
+  const transferEvents = useEventListener(readContracts, "FarmedParticle", "Transfer", localProvider, 1);
   console.log("📟 Transfer events:",transferEvents)
 
 
@@ -181,17 +181,17 @@ function App(props) {
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
   //
   const yourBalance = balance && balance.toNumber && balance.toNumber()
-  const [ yourCollectibles, setYourCollectibles ] = useState()
+  const [ farmedParticles, setFarmedParticles ] = useState()
 
   useEffect(()=>{
-    const updateYourCollectibles = async () => {
+    const updateFarmedParticles = async () => {
       let collectibleUpdate = []
       for(let tokenIndex=0;tokenIndex<balance;tokenIndex++){
         try{
-          console.log("GEtting token index",tokenIndex)
-          const tokenId = await readContracts.YourCollectible.tokenOfOwnerByIndex(address, tokenIndex)
+          console.log("Getting token index",tokenIndex)
+          const tokenId = await readContracts.FarmedParticle.tokenOfOwnerByIndex(address, tokenIndex)
           console.log("tokenId",tokenId)
-          const tokenURI = await readContracts.YourCollectible.tokenURI(tokenId)
+          const tokenURI = await readContracts.FarmedParticle.tokenURI(tokenId)
           console.log("tokenURI",tokenURI)
 
           const ipfsHash =  tokenURI.replace("https://ipfs.io/ipfs/","")
@@ -207,9 +207,9 @@ function App(props) {
 
         }catch(e){console.log(e)}
       }
-      setYourCollectibles(collectibleUpdate)
+      setFarmedParticles(collectibleUpdate)
     }
-    updateYourCollectibles()
+    updateFarmedParticles()
   },[ address, yourBalance ])
 
   /*
@@ -291,22 +291,22 @@ function App(props) {
 
   const [ loadedAssets, setLoadedAssets ] = useState()
   useEffect(()=>{
-    const updateYourCollectibles = async () => {
+    const updateFarmedParticles = async () => {
       let assetUpdate = []
       for(let a in assets){
         try{
-          const forSale = await readContracts.YourCollectible.forSale(utils.id(a))
-          let owner
-          if(!forSale){
-            const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(a))
-            owner = await readContracts.YourCollectible.ownerOf(tokenId)
-          }
-          assetUpdate.push({id:a,...assets[a],forSale:forSale,owner:owner})
+          // const forSale = await readContracts.FarmedParticle.forSale(utils.id(a))
+          // let owner
+          // if(!forSale){
+          //   const tokenId = await readContracts.FarmedParticle.uriToTokenId(utils.id(a))
+          //   owner = await readContracts.FarmedParticle.ownerOf(tokenId)
+          // }
+          assetUpdate.push({id:a,...assets[a]})
         }catch(e){console.log(e)}
       }
       setLoadedAssets(assetUpdate)
     }
-    if(readContracts && readContracts.YourCollectible) updateYourCollectibles()
+    if(readContracts && readContracts.FarmedParticle) updateFarmedParticles()
   }, [ assets, readContracts, transferEvents ]);
 
   let galleryList = []
@@ -314,40 +314,40 @@ function App(props) {
     console.log("loadedAssets",a,loadedAssets[a])
 
     let cardActions = []
-    if(loadedAssets[a].forSale){
+    // if(loadedAssets[a].forSale){
       cardActions.push(
         <div>
           <Button onClick={()=>{
             console.log("gasPrice,",gasPrice)
-            tx( writeContracts.YourCollectible.mintItem(loadedAssets[a].id,{gasPrice:gasPrice}) )
+            tx( writeContracts.FarmedParticle.mintItem(loadedAssets[a].id,{gasPrice:gasPrice}) )
           }}>
-            Mint
+            Buy Field
           </Button>
         </div>
       )
-    }else{
-      cardActions.push(
-        <div>
-          owned by: <Address
-            address={loadedAssets[a].owner}
-            ensProvider={mainnetProvider}
-            blockExplorer={blockExplorer}
-            minimized={true}
-          />
-        </div>
-      )
-    }
+    // }else{
+    //   cardActions.push(
+    //     <div>
+    //       owned by: <Address
+    //         address={loadedAssets[a].owner}
+    //         ensProvider={mainnetProvider}
+    //         blockExplorer={blockExplorer}
+    //         minimized={true}
+    //       />
+    //     </div>
+    //   )
+    // }
 
     galleryList.push(
-      <Card style={{width:200}} key={loadedAssets[a].name}
+      <Card style={{width:500}} key={loadedAssets[a].name}
         actions={cardActions}
         title={(
           <div>
-            {loadedAssets[a].name} <a style={{cursor:"pointer",opacity:0.33}} href={loadedAssets[a].external_url} target="_blank"><LinkOutlined /></a>
+            {loadedAssets[a].name}
           </div>
         )}
       >
-        <img style={{maxWidth:130}} src={loadedAssets[a].image}/>
+        <img style={{maxWidth:300}} src={loadedAssets[a].image}/>
         <div style={{opacity:0.77}}>
           {loadedAssets[a].description}
         </div>
@@ -366,12 +366,12 @@ function App(props) {
 
         <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
-            <Link onClick={()=>{setRoute("/")}} to="/">Gallery</Link>
+            <Link onClick={()=>{setRoute("/")}} to="/">Your Farm</Link>
           </Menu.Item>
-          <Menu.Item key="/yourcollectibles">
-            <Link onClick={()=>{setRoute("/yourcollectibles")}} to="/yourcollectibles">YourCollectibles</Link>
+          <Menu.Item key="/availablefields">
+            <Link onClick={()=>{setRoute("/availablefields")}} to="/availablefields">Available Fields</Link>
           </Menu.Item>
-          <Menu.Item key="/transfers">
+          {/* <Menu.Item key="/transfers">
             <Link onClick={()=>{setRoute("/transfers")}} to="/transfers">Transfers</Link>
           </Menu.Item>
           <Menu.Item key="/ipfsup">
@@ -379,7 +379,7 @@ function App(props) {
           </Menu.Item>
           <Menu.Item key="/ipfsdown">
             <Link onClick={()=>{setRoute("/ipfsdown")}} to="/ipfsdown">IPFS Download</Link>
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item key="/debugcontracts">
             <Link onClick={()=>{setRoute("/debugcontracts")}} to="/debugcontracts">Debug Contracts</Link>
           </Menu.Item>
@@ -387,29 +387,10 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
-            {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-            <div style={{ maxWidth:820, margin: "auto", marginTop:32, paddingBottom:256 }}>
-              <StackGrid
-                columnWidth={200}
-                gutterWidth={16}
-                gutterHeight={16}
-              >
-                {galleryList}
-              </StackGrid>
-            </div>
-
-          </Route>
-
-          <Route path="/yourcollectibles">
-            <div style={{ width:640, margin: "auto", marginTop:32, paddingBottom:32 }}>
+            <div style={{ width:2000, margin: "auto", marginTop:32, paddingBottom:32 }}>
               <List
                 bordered
-                dataSource={yourCollectibles}
+                dataSource={farmedParticles}
                 renderItem={(item) => {
                   const id = item.id.toNumber()
                   return (
@@ -442,7 +423,7 @@ function App(props) {
                         />
                         <Button onClick={()=>{
                           console.log("writeContracts",writeContracts)
-                          tx( writeContracts.YourCollectible.transferFrom(address, transferToAddresses[id], id) )
+                          tx( writeContracts.FarmedParticle.transferFrom(address, transferToAddresses[id], id) )
                         }}>
                           Transfer
                         </Button>
@@ -452,6 +433,25 @@ function App(props) {
                 }}
               />
             </div>
+          </Route>
+
+          <Route path="/availablefields">
+            {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+            <div style={{ maxWidth:2000, margin: "auto", marginTop:32, paddingBottom:256 }}>
+              <StackGrid
+                columnWidth={500}
+                gutterWidth={16}
+                gutterHeight={16}
+              >
+                {galleryList}
+              </StackGrid>
+            </div>
+
           </Route>
 
           <Route path="/transfers">
