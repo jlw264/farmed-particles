@@ -32,10 +32,8 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
 
   Counters.Counter internal _tokenIds;
 
-  mapping (uint256 => address) internal _tokenCreator;
-  // mapping (uint256 => uint256) internal _tokenCreatorRoyaltiesPct;
-  // mapping (uint256 => address) internal _tokenCreatorRoyaltiesRedirect;
-  // mapping (address => uint256) internal _tokenCreatorClaimableRoyalties;
+  address internal _farmCreator;
+  uint256 internal _farmCreatorAnnuityPercent;
 
   mapping (uint256 => uint256) internal _tokenSalePrice;
   mapping (uint256 => uint256) internal _tokenLastSellPrice;
@@ -47,7 +45,10 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   |          Initialization           |
   |__________________________________*/
 
-  constructor() public ERC721("Farmed Particles", "FARMED") {}
+  constructor(address farmCreator, uint256 farmCreatorAnnuityPercent) public ERC721("Farmed Particles", "FARMED") {
+    _farmCreator = farmCreator;
+    _farmCreatorAnnuityPercent = farmCreatorAnnuityPercent;
+  }
 
 
   /***********************************|
@@ -55,7 +56,7 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   |__________________________________*/
 
   function creatorOf(uint256 tokenId) external view virtual override returns (address) {
-    return _tokenCreator[tokenId];
+    return _farmCreator;
   }
 
   function getSalePrice(uint256 tokenId) external view virtual override returns (uint256) {
@@ -66,161 +67,63 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     return _tokenLastSellPrice[tokenId];
   }
 
-  // function getCreatorRoyalties(address account) external view virtual override returns (uint256) {
-  //   return _tokenCreatorClaimableRoyalties[account];
-  // }
+  function getCreatorAnnuityPercent() external view virtual override returns (uint256) {
+    return _farmCreatorAnnuityPercent;
+  }
 
-  // function getCreatorRoyaltiesPct(uint256 tokenId) external view virtual override returns (uint256) {
-  //   return _tokenCreatorRoyaltiesPct[tokenId];
-  // }
+  function createEmptyField(
+    address receiver,
+    string memory tokenMetaUri
+  )
+    external
+    virtual
+    override
+    whenNotPaused
+    returns (uint256 newTokenId)
+  {
+    newTokenId = _createEmptyField(
+      _farmCreator,
+      receiver,
+      tokenMetaUri,
+      _farmCreatorAnnuityPercent
+    );
+  }
 
-  // function getCreatorRoyaltiesReceiver(uint256 tokenId) external view virtual override returns (address) {
-  //   return _creatorRoyaltiesReceiver(tokenId);
-  // }
-
-  // function claimCreatorRoyalties()
-  //   external
-  //   virtual
-  //   override
-  //   nonReentrant
-  //   whenNotPaused
-  //   returns (uint256)
-  // {
-  //   return _claimCreatorRoyalties(_msgSender());
-  // }
-
-  // function createChargedParticle(
-  //   address creator,
-  //   address receiver,
-  //   address referrer,
-  //   string memory tokenMetaUri,
-  //   string memory walletManagerId,
-  //   address assetToken,
-  //   uint256 assetAmount,
-  //   uint256 annuityPercent
-  // )
-  //   external
-  //   virtual
-  //   override
-  //   nonReentrant
-  //   whenNotPaused
-  //   returns (uint256 newTokenId)
-  // {
-  //   newTokenId = _createChargedParticle(
-  //     creator,
-  //     receiver,
-  //     referrer,
-  //     tokenMetaUri,
-  //     walletManagerId,
-  //     assetToken,
-  //     assetAmount,
-  //     annuityPercent
-  //   );
-  // }
-
-  // function createBasicProton(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri
-  // )
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  //   returns (uint256 newTokenId)
-  // {
-  //   newTokenId = _createProton(
-  //     creator,
-  //     receiver,
-  //     tokenMetaUri,
-  //     0, // annuityPercent,
-  //     0, // royaltiesPercent
-  //     0  // salePrice
-  //   );
-  // }
-
-  // function createProton(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri,
-  //   uint256 annuityPercent
-  // )
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  //   returns (uint256 newTokenId)
-  // {
-  //   newTokenId = _createProton(
-  //     creator,
-  //     receiver,
-  //     tokenMetaUri,
-  //     annuityPercent,
-  //     0, // royaltiesPercent
-  //     0  // salePrice
-  //   );
-  // }
-
-  // function createProtonForSale(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri,
-  //   uint256 annuityPercent,
-  //   uint256 royaltiesPercent,
-  //   uint256 salePrice
-  // )
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  //   returns (uint256 newTokenId)
-  // {
-  //   newTokenId = _createProton(
-  //     creator,
-  //     receiver,
-  //     tokenMetaUri,
-  //     annuityPercent,
-  //     royaltiesPercent,
-  //     salePrice
-  //   );
-  // }
-
-  // function batchProtonsForSale(
-  //   address creator,
-  //   uint256 annuityPercent,
-  //   uint256 royaltiesPercent,
-  //   string[] calldata tokenMetaUris,
-  //   uint256[] calldata salePrices
-  // )
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  // {
-  //   _batchProtonsForSale(
-  //     creator,
-  //     annuityPercent,
-  //     royaltiesPercent,
-  //     tokenMetaUris,
-  //     salePrices
-  //   );
-  // }
-
-  // function buyProton(uint256 tokenId)
-  //   external
-  //   payable
-  //   virtual
-  //   override
-  //   nonReentrant
-  //   whenNotPaused
-  //   returns (bool)
-  // {
-  //   return _buyProton(tokenId);
-  // }
+  function buyField(uint256 tokenId)
+    external
+    payable
+    virtual
+    override
+    nonReentrant
+    whenNotPaused
+    returns (bool)
+  {
+    return _buyField(tokenId);
+  }
 
   /***********************************|
   |     Only Token Creator/Owner      |
   |__________________________________*/
+
+  function plantCrops(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  ) 
+    external
+    virtual
+    override
+    nonReentrant
+    whenNotPaused
+  {
+    return _plantCrops(
+      tokenId,
+      walletManagerId,
+      assetToken,
+      assetAmount
+    );
+  }
 
   function setSalePrice(uint256 tokenId, uint256 salePrice)
     external
@@ -231,27 +134,6 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   {
     _setSalePrice(tokenId, salePrice);
   }
-
-  // function setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct)
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  //   onlyTokenCreator(tokenId)
-  //   onlyTokenOwnerOrApproved(tokenId)
-  // {
-  //   _setRoyaltiesPct(tokenId, royaltiesPct);
-  // }
-
-  // function setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver)
-  //   external
-  //   virtual
-  //   override
-  //   whenNotPaused
-  //   onlyTokenCreator(tokenId)
-  // {
-  //   _tokenCreatorRoyaltiesRedirect[tokenId] = receiver;
-  // }
 
 
   /***********************************|
@@ -322,205 +204,98 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     emit SalePriceSet(tokenId, salePrice);
   }
 
-  // function _setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct) internal virtual {
-  //   _tokenCreatorRoyaltiesPct[tokenId] = royaltiesPct;
-  //   emit CreatorRoyaltiesSet(tokenId, royaltiesPct);
-  // }
+  function _createEmptyField(
+    address creator,
+    address receiver,
+    string memory tokenMetaUri,
+    uint256 annuityPercent
+  )
+    internal
+    virtual
+    returns (uint256 newTokenId)
+  {
+    require(address(_chargedSettings) != address(0x0), "PRT:E-107");
 
-  // function _creatorRoyaltiesReceiver(uint256 tokenId) internal view virtual returns (address) {
-  //   address receiver = _tokenCreatorRoyaltiesRedirect[tokenId];
-  //   if (receiver == address(0x0)) {
-  //     receiver = _tokenCreator[tokenId];
-  //   }
-  //   return receiver;
-  // }
+    _tokenIds.increment();
 
-  // function _createChargedParticle(
-  //   address creator,
-  //   address receiver,
-  //   address referrer,
-  //   string memory tokenMetaUri,
-  //   string memory walletManagerId,
-  //   address assetToken,
-  //   uint256 assetAmount,
-  //   uint256 annuityPercent
-  // )
-  //   internal
-  //   virtual
-  //   returns (uint256 newTokenId)
-  // {
-  //   require(address(_chargedParticles) != address(0x0), "PRT:E-107");
+    newTokenId = _tokenIds.current();
+    _safeMint(receiver, newTokenId, "");
 
-  //   newTokenId = _createProton(creator, receiver, tokenMetaUri, annuityPercent, 0, 0);
+    _setTokenURI(newTokenId, tokenMetaUri);  // TODO
 
-  //   _chargeParticle(newTokenId, walletManagerId, assetToken, assetAmount, referrer);
-  // }
+    if (annuityPercent > 0) {
+      _chargedSettings.setCreatorAnnuities(
+        address(this),
+        newTokenId,
+        creator,
+        annuityPercent
+      );
+    }
+  }
 
-  // function _createProton(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri,
-  //   uint256 annuityPercent,
-  //   uint256 royaltiesPercent,
-  //   uint256 salePrice
-  // )
-  //   internal
-  //   virtual
-  //   returns (uint256 newTokenId)
-  // {
-  //   _tokenIds.increment();
+  function _plantCrops(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    internal
+    virtual
+  {
+    require(address(_chargedParticles) != address(0x0), "PRT:E-107");
 
-  //   newTokenId = _tokenIds.current();
-  //   _safeMint(receiver, newTokenId, "");
-  //   _tokenCreator[newTokenId] = creator;
+    _chargeParticle(tokenId, walletManagerId, assetToken, assetAmount);
+  }
 
-  //   _setTokenURI(newTokenId, tokenMetaUri);
+  function _chargeParticle(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  )
+    internal
+    virtual
+  {
+    _collectAssetToken(_msgSender(), assetToken, assetAmount);
 
-  //   if (royaltiesPercent > 0) {
-  //     _setRoyaltiesPct(newTokenId, royaltiesPercent);
-  //   }
+    IERC20(assetToken).approve(address(_chargedParticles), assetAmount);
 
-  //   if (salePrice > 0) {
-  //     _setSalePrice(newTokenId, salePrice);
-  //   }
+    _chargedParticles.energizeParticle(
+      address(this),
+      tokenId,
+      walletManagerId,
+      assetToken,
+      assetAmount,
+      address(0)  // blackhole
+    );
+  }
 
-  //   if (annuityPercent > 0) {
-  //     _chargedSettings.setCreatorAnnuities(
-  //       address(this),
-  //       newTokenId,
-  //       creator,
-  //       annuityPercent
-  //     );
-  //   }
-  // }
+  function _buyField(uint256 tokenId)
+    internal
+    virtual
+    returns (bool)
+  {
+    uint256 salePrice = _tokenSalePrice[tokenId];
+    require(salePrice > 0, "PRT:E-416");
+    require(msg.value >= salePrice, "PRT:E-414");
 
-  // function _batchProtonsForSale(
-  //   address creator,
-  //   uint256 annuityPercent,
-  //   uint256 royaltiesPercent,
-  //   string[] calldata tokenMetaUris,
-  //   uint256[] calldata salePrices
-  // )
-  //   internal
-  //   virtual
-  // {
-  //   require(tokenMetaUris.length == salePrices.length, "PRT:E-202");
-  //   address self = address(this);
+    uint256 ownerAmount = salePrice;
+    address oldOwner = ownerOf(tokenId);
+    address newOwner = _msgSender();
 
-  //   uint256 count = tokenMetaUris.length;
-  //   for (uint256 i = 0; i < count; i++) {
-  //     _tokenIds.increment();
-  //     uint256 newTokenId = _tokenIds.current();
+    _tokenLastSellPrice[tokenId] = salePrice;
 
-  //     _safeMint(creator, newTokenId, "");
-  //     _tokenCreator[newTokenId] = creator;
+    // Transfer Token
+    _transfer(oldOwner, newOwner, tokenId);
 
-  //     _setTokenURI(newTokenId, tokenMetaUris[i]);
+    // Transfer Payment
+    payable(oldOwner).sendValue(ownerAmount);
 
-  //     if (royaltiesPercent > 0) {
-  //       _setRoyaltiesPct(newTokenId, royaltiesPercent);
-  //     }
+    emit FieldSold(tokenId, oldOwner, newOwner, salePrice);
 
-  //     uint256 salePrice = salePrices[i];
-  //     if (salePrice > 0) {
-  //       _setSalePrice(newTokenId, salePrice);
-  //     }
-
-  //     if (annuityPercent > 0) {
-  //       _chargedSettings.setCreatorAnnuities(
-  //         self,
-  //         newTokenId,
-  //         creator,
-  //         annuityPercent
-  //       );
-  //     }
-  //   }
-  // }
-
-  // function _chargeParticle(
-  //   uint256 tokenId,
-  //   string memory walletManagerId,
-  //   address assetToken,
-  //   uint256 assetAmount,
-  //   address referrer
-  // )
-  //   internal
-  //   virtual
-  // {
-  //   _collectAssetToken(_msgSender(), assetToken, assetAmount);
-
-  //   IERC20(assetToken).approve(address(_chargedParticles), assetAmount);
-
-  //   _chargedParticles.energizeParticle(
-  //     address(this),
-  //     tokenId,
-  //     walletManagerId,
-  //     assetToken,
-  //     assetAmount,
-  //     referrer
-  //   );
-  // }
-
-  // function _buyProton(uint256 tokenId)
-  //   internal
-  //   virtual
-  //   returns (bool)
-  // {
-  //   uint256 salePrice = _tokenSalePrice[tokenId];
-  //   require(salePrice > 0, "PRT:E-416");
-  //   require(msg.value >= salePrice, "PRT:E-414");
-
-  //   uint256 ownerAmount = salePrice;
-  //   uint256 creatorAmount;
-  //   address oldOwner = ownerOf(tokenId);
-  //   address newOwner = _msgSender();
-
-  //   // Creator Royalties
-  //   address royaltiesReceiver = _creatorRoyaltiesReceiver(tokenId);
-  //   uint256 royaltiesPct = _tokenCreatorRoyaltiesPct[tokenId];
-  //   uint256 lastSellPrice = _tokenLastSellPrice[tokenId];
-  //   if (royaltiesPct > 0 && lastSellPrice > 0 && salePrice > lastSellPrice) {
-  //     creatorAmount = (salePrice - lastSellPrice).mul(royaltiesPct).div(PERCENTAGE_SCALE);
-  //     ownerAmount = ownerAmount.sub(creatorAmount);
-  //   }
-  //   _tokenLastSellPrice[tokenId] = salePrice;
-
-  //   // Signal to Universe Controller
-  //   if (address(_universe) != address(0)) {
-  //     _universe.onProtonSale(address(this), tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
-  //   }
-
-  //   // Reserve Royalties for Creator
-  //   if (creatorAmount > 0) {
-  //     _tokenCreatorClaimableRoyalties[royaltiesReceiver] = _tokenCreatorClaimableRoyalties[royaltiesReceiver].add(creatorAmount);
-  //   }
-
-  //   // Transfer Token
-  //   _transfer(oldOwner, newOwner, tokenId);
-
-  //   // Transfer Payment
-  //   payable(oldOwner).sendValue(ownerAmount);
-
-  //   emit ProtonSold(tokenId, oldOwner, newOwner, salePrice, royaltiesReceiver, creatorAmount);
-
-  //   _refundOverpayment(salePrice);
-  //   return true;
-  // }
-
-  // /**
-  //   * @dev Pays out the Creator Royalties of the calling account
-  //   * @param receiver  The receiver of the claimable royalties
-  //   * @return          The amount of Creator Royalties claimed
-  //   */
-  // function _claimCreatorRoyalties(address receiver) internal virtual returns (uint256) {
-  //   uint256 claimableAmount = _tokenCreatorClaimableRoyalties[receiver];
-  //   require(claimableAmount > 0, "PRT:E-411");
-
-  //   delete _tokenCreatorClaimableRoyalties[receiver];
-  //   payable(receiver).sendValue(claimableAmount);
-
-  //   emit RoyaltiesClaimed(receiver, claimableAmount);
-  // }
+    _refundOverpayment(salePrice);
+    return true;
+  }
 
   /**
     * @dev Collects the Required Asset Token from the users wallet
@@ -590,7 +365,7 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   }
 
   modifier onlyTokenCreator(uint256 tokenId) {
-    require(_tokenCreator[tokenId] == _msgSender(), "PRT:E-104");
+    require(_farmCreator == _msgSender(), "PRT:E-104");
     _;
   }
 

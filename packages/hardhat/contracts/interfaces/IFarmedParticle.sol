@@ -47,10 +47,8 @@ interface IFarmedParticle is IERC721 {
   event ChargedParticlesSet(address indexed chargedParticles);
   event PausedStateSet(bool isPaused);
   event SalePriceSet(uint256 indexed tokenId, uint256 salePrice);
-  // event CreatorRoyaltiesSet(uint256 indexed tokenId, uint256 royaltiesPct);
   event FeesWithdrawn(address indexed receiver, uint256 amount);
-  // event ProtonSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice, address creator, uint256 creatorRoyalties);
-  // event RoyaltiesClaimed(address indexed receiver, uint256 amountClaimed);
+  event FieldSold(uint256 indexed tokenId, address indexed oldOwner, address indexed newOwner, uint256 salePrice);
 
   /***********************************|
   |              Public               |
@@ -59,12 +57,10 @@ interface IFarmedParticle is IERC721 {
   function creatorOf(uint256 tokenId) external view returns (address);
   function getSalePrice(uint256 tokenId) external view returns (uint256);
   function getLastSellPrice(uint256 tokenId) external view returns (uint256);
-  // function getCreatorRoyalties(address account) external view returns (uint256);
-  // function getCreatorRoyaltiesPct(uint256 tokenId) external view returns (uint256);
-  // function getCreatorRoyaltiesReceiver(uint256 tokenId) external view returns (address);
+  function getCreatorAnnuityPercent() external view returns (uint256);
 
-  // function buyProton(uint256 tokenId) external payable returns (bool);
-  // function claimCreatorRoyalties() external returns (uint256);
+  // modeled off of buyProton
+  function buyField(uint256 tokenId) external payable returns (bool);
 
   // function createChargedParticle(
   //   address creator,
@@ -77,41 +73,23 @@ interface IFarmedParticle is IERC721 {
   //   uint256 annuityPercent
   // ) external returns (uint256 newTokenId);
 
-  // function createBasicProton(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri
-  // ) external returns (uint256 newTokenId);
+  // modeled off of createProton
+  function createEmptyField(
+    address receiver,
+    string memory tokenMetaUri
+  ) external returns (uint256 newTokenId);
 
-  // function createProton(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri,
-  //   uint256 annuityPercent
-  // ) external returns (uint256 newTokenId);
-
-  // function createProtonForSale(
-  //   address creator,
-  //   address receiver,
-  //   string memory tokenMetaUri,
-  //   uint256 annuityPercent,
-  //   uint256 royaltiesPercent,
-  //   uint256 salePrice
-  // ) external returns (uint256 newTokenId);
-
-  // function batchProtonsForSale(
-  //   address creator,
-  //   uint256 annuityPercent,
-  //   uint256 royaltiesPercent,
-  //   string[] calldata tokenMetaUris,
-  //   uint256[] calldata salePrices
-  // ) external;
 
   /***********************************|
   |     Only Token Creator/Owner      |
   |__________________________________*/
 
+  function plantCrops(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken,
+    uint256 assetAmount
+  ) external;
+
   function setSalePrice(uint256 tokenId, uint256 salePrice) external;
-  // function setRoyaltiesPct(uint256 tokenId, uint256 royaltiesPct) external;
-  // function setCreatorRoyaltiesReceiver(uint256 tokenId, address receiver) external;
 }

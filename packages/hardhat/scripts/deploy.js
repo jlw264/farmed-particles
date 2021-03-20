@@ -25,7 +25,7 @@ const main = async () => {
   // const yourCollectible = await deploy("YourCollectible",[ bytes32Array ]) // <-- add in constructor args like line 19 vvvv
 
   //const yourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
-  const secondContract = await deploy("FarmedParticle")
+  const secondContract = await deploy("FarmedParticle", ["0xE146F04b0B5A99A35D4B25edf5AD8aa8d26D96b9", 2])
 
   // const exampleToken = await deploy("ExampleToken")
   // const examplePriceOracle = await deploy("ExamplePriceOracle")
