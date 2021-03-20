@@ -61,5 +61,11 @@
       "**/hardhat",
       "**/hardhat/**"
     ]
+  },
+  "dependencies": {
+    "@opengsn/gsn": "^2.1.0",
+    "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/contracts-upgradeable": "^3.4.1",
+    "openzeppelin-solidity": "^3.4.1"
   }
 }

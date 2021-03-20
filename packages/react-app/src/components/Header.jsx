@@ -8,7 +8,7 @@ export default function Header() {
     <a href="https://github.com/jlw264/farmed-particles" target="_blank" rel="noopener noreferrer">
       <PageHeader
         title="Farmed Particles"
-        subTitle="Yield farming NFTs built on Charged Particles!"
+        subTitle="Yield-farming NFTs built on Charged Particles!"
         style={{ cursor: "pointer" }}
       />
     </a>

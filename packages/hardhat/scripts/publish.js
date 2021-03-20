@@ -80,6 +80,7 @@ async function main() {
     fs.mkdirSync(publishDir);
   }
   const finalContractList = [];
+  console.log(bre.config.paths.sources);
   fs.readdirSync(bre.config.paths.sources).forEach((file) => {
     if (file.indexOf(".sol") >= 0) {
       const contractName = file.replace(".sol", "");

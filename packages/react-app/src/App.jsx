@@ -543,7 +543,7 @@ function App(props) {
           </Route>
           <Route path="/debugcontracts">
               <Contract
-                name="YourCollectible"
+                name="FarmedParticle"
                 signer={userProvider.getSigner()}
                 provider={localProvider}
                 address={address}
