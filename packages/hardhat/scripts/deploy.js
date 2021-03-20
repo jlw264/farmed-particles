@@ -30,6 +30,24 @@ const main = async () => {
   //const yourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
   const farmedParticleContract = await deploy("FarmedParticle", [creatorAddressKovan, creatorAnnuity])
 
+  // TODO after deploy:
+  // setChargedParticles - kovan: 0xF03EAB2b60eFB6E24C1b254A2D6fC91Eb639D6d3
+  // setChargedSettings - kovan: 0x57B5C64E0494a7Bd4A98B33C105E3ef31301dFdF
+  // setChargedState - kovan: 0xD63423049022bd77C530aD6f293Bc4209A6d565B
+  // setAssetTokenMap:
+  //   dai: 0xff795577d9ac8bd7d90ee22b6c1703490b6512fd
+  //   uni: 0x075a36ba8846c6b6f53644fdd3bf17e5151789dc
+  //   usdc: 0xe22da380ee6b445bb8273c81944adeb6e8450422
+  // setStatusToTokenURIMap
+  //   emptyUri: https://ipfs.io/ipfs/bafkreichleu2uxowpv657abpzw7rhx3dziz5affbdwek2rywowgvxh6owm
+  //   plantedUri: https://ipfs.io/ipfs/bafkreig4fzs7ldjzlm4lfcabofwpjr74dj5lsjvfizcafqnugrohdkgndm
+  //   halfDaiUri: https://ipfs.io/ipfs/bafkreibszz3qdrfvll5hq4t4xbqu3pksbfem23idpgmyimfe77ht7ctmrq
+  //   halfUniUri: https://ipfs.io/ipfs/bafkreihh4jp2mschybttfsogsqo624tdjpqkdaevpa3cnyko3lvswsned4
+  //   halfUsdcUri: https://ipfs.io/ipfs/bafkreicpzmnhifgysl57omc333q72ayny6kf4tb7mgwnmi3hwzb73o7tci
+  //   fullDaiUri: https://ipfs.io/ipfs/bafkreiftngc7f2ms273dktxtvrrkmvsklmnu2dakwrzhglnpjtjb4oein4
+  //   fullUniUri: https://ipfs.io/ipfs/bafkreiggbbfwbsddjequgwoadrvaysing3eqldvlyjmdqmt3sbpbo4pzo4
+  //   fullUsdcUri: https://ipfs.io/ipfs/bafkreig3r4dz665h6p4wcudfg47ucrbgzrzgvkpehvf2i53ulcidyik7ni
+
   // const exampleToken = await deploy("ExampleToken")
   // const examplePriceOracle = await deploy("ExamplePriceOracle")
   // const smartContractWallet = await deploy("SmartContractWallet",[exampleToken.address,examplePriceOracle.address])

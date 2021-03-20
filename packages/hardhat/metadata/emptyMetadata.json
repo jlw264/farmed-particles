@@ -1,0 +1,11 @@
+{
+  "name": "Empty Farmed Particle",
+  "description": "Waiting for you to plant some crops!",
+  "image": "https://ipfs.io/ipfs/bafkreihpglzjgi3l5lw4jxlplutqze7juc7kobjmgxfrylpaekgt554jty",
+  "attributes": [
+		{
+		  "trait_type": "Growth Level", 
+		  "value": "Empty"
+		}
+	]
+}

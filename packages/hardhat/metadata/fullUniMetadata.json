@@ -1,0 +1,15 @@
+{
+  "name": "Full-Grown Farmed Particle",
+  "description": "Ready for harvest!",
+  "image": "https://ipfs.io/ipfs/bafybeieenci5ijg4bchwuv55edfhunm6amxw74ycmfyzmkbtapss2y2pb4",
+  "attributes": [
+		{
+		  "trait_type": "Growth Level", 
+		  "value": "Full"
+		},
+		{
+		  "trait_type": "Asset", 
+		  "value": "UNI"
+		}
+	]
+}

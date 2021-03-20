@@ -1,0 +1,15 @@
+{
+  "name": "Half-Grown Farmed Particle",
+  "description": "Almost ready for harvest.",
+  "image": "https://ipfs.io/ipfs/bafybeifeqzd2hetmtrp4olbb2whyj6jlvhuku5uoxmc5v7a3obdn7nk5lq",
+  "attributes": [
+		{
+		  "trait_type": "Growth Level", 
+		  "value": "Half"
+		},
+		{
+		  "trait_type": "Asset", 
+		  "value": "USDC"
+		}
+	]
+}

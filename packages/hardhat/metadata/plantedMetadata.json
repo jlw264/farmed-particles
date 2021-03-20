@@ -1,0 +1,11 @@
+{
+  "name": "Planted Farmed Particle",
+  "description": "Now we're growing somewhere...",
+  "image": "https://ipfs.io/ipfs/bafybeif5l3leyola26xmwyy6m23n366ph7tvtqoc7mz7b4w2ufvwutkaoa",
+  "attributes": [
+		{
+		  "trait_type": "Growth Level", 
+		  "value": "Planted"
+		}
+	]
+}

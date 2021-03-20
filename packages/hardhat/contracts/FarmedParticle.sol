@@ -33,10 +33,10 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     Planted,
     HalfDai,
     HalfUni,
-    HalfUsdt,
+    HalfUsdc,
     FullDai,
     FullUni,
-    FullUsdt
+    FullUsdc
   }
 
   IUniverse internal _universe;
@@ -128,12 +128,12 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     );
   }
 
-  function getParticleMassAaveUsdt(uint256 tokenId) public virtual returns (uint256) {
+  function getParticleMassAaveUsdc(uint256 tokenId) public virtual returns (uint256) {
     return _getBaseParticleMass(
       _tokenIdToTokenAddress[tokenId], 
       tokenId, 
       "aave", 
-      _assetSymbolToAssetToken["usdt"]
+      _assetSymbolToAssetToken["usdc"]
     );
   }
 
@@ -155,40 +155,40 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     );
   }
 
-  function getChargeAaveUsdt(uint256 tokenId) public virtual returns (uint256) {
+  function getChargeAaveUsdc(uint256 tokenId) public virtual returns (uint256) {
     return _getCurrentParticleCharge(
       _tokenIdToTokenAddress[tokenId], 
       tokenId, 
       "aave", 
-      _assetSymbolToAssetToken["usdt"]
+      _assetSymbolToAssetToken["usdc"]
     );
   }
 
   function getStatus(uint256 tokenId) public virtual returns (Status) {
     uint256 baseDai = getParticleMassAaveDai(tokenId);
     uint256 baseUni = getParticleMassAaveUni(tokenId);
-    uint256 baseUsdt = getParticleMassAaveUsdt(tokenId);
+    uint256 baseUsdc = getParticleMassAaveUsdc(tokenId);
 
-    if ((baseDai + baseUni + baseUsdt) == 0) {
+    if ((baseDai + baseUni + baseUsdc) == 0) {
       return Status.Empty;
     }
 
     uint256 chargeDai = getChargeAaveDai(tokenId);
     uint256 chargeUni = getChargeAaveUni(tokenId);
-    uint256 chargeUsdt = getChargeAaveUsdt(tokenId);
+    uint256 chargeUsdc = getChargeAaveUsdc(tokenId);
 
     if (chargeDai > _fullHarvestThreshold) {
       return Status.FullDai;
     } else if (chargeUni > _fullHarvestThreshold) {
       return Status.FullUni;
-    } else if (chargeUsdt > _fullHarvestThreshold) {
-      return Status.FullUsdt;
+    } else if (chargeUsdc > _fullHarvestThreshold) {
+      return Status.FullUsdc;
     } else if (chargeDai > _halfHarvestThreshold) {
       return Status.HalfDai;
     } else if (chargeUni > _halfHarvestThreshold) {
       return Status.HalfUni;
-    } else if (chargeUsdt > _halfHarvestThreshold) {
-      return Status.HalfUsdt;
+    } else if (chargeUsdc > _halfHarvestThreshold) {
+      return Status.HalfUsdc;
     }
     
     return Status.Planted;
@@ -314,10 +314,10 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   }
 
   /// @dev Setup the Asset Token Map
-  function setAssetTokenMap(address daiToken, address uniToken, address usdtToken) external virtual onlyOwner {
+  function setAssetTokenMap(address daiToken, address uniToken, address usdcToken) external virtual onlyOwner {
     _assetSymbolToAssetToken["dai"] = daiToken;
     _assetSymbolToAssetToken["uni"] = uniToken;
-    _assetSymbolToAssetToken["usdt"] = usdtToken;
+    _assetSymbolToAssetToken["usdc"] = usdcToken;
   }
 
   /// @dev Setup the Status to tokenURI Map
@@ -326,10 +326,10 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     string memory plantedUri, 
     string memory halfDaiUri, 
     string memory halfUniUri, 
-    string memory halfUsdtUri, 
+    string memory halfUsdcUri, 
     string memory fullDaiUri, 
     string memory fullUniUri, 
-    string memory fullUsdtUri
+    string memory fullUsdcUri
   ) 
     external 
     virtual 
@@ -339,10 +339,10 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     _statusToTokenURI[Status.Planted] = plantedUri;
     _statusToTokenURI[Status.HalfDai] = halfDaiUri;
     _statusToTokenURI[Status.HalfUni] = halfUniUri;
-    _statusToTokenURI[Status.HalfUsdt] = halfUsdtUri;
+    _statusToTokenURI[Status.HalfUsdc] = halfUsdcUri;
     _statusToTokenURI[Status.FullDai] = fullDaiUri;
     _statusToTokenURI[Status.FullUni] = fullUniUri;
-    _statusToTokenURI[Status.FullUsdt] = fullUsdtUri;
+    _statusToTokenURI[Status.FullUsdc] = fullUsdcUri;
   }
 
   function setHarvestThresholds(uint256 fullThreshold, uint256 halfThreshold) 
