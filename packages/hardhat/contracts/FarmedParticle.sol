@@ -1,4 +1,4 @@
-pragma solidity >=0.6.0 <0.7.0;
+pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 //SPDX-License-Identifier: MIT
 
@@ -25,6 +25,20 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   using Address for address payable;
   using Counters for Counters.Counter;
 
+  uint256 constant FULL_CHARGE_THRESHOLD = 2;
+  uint256 constant HALF_CHARGE_THRESHOLD = 1;
+
+  enum Status {
+    Empty,
+    Planted,
+    HalfDai,
+    HalfUni,
+    HalfUsdt,
+    FullDai,
+    FullUni,
+    FullUsdt
+  }
+
   IUniverse internal _universe;
   IChargedState internal _chargedState;
   IChargedSettings internal _chargedSettings;
@@ -37,6 +51,10 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
 
   mapping (uint256 => uint256) internal _tokenSalePrice;
   mapping (uint256 => uint256) internal _tokenLastSellPrice;
+  
+  mapping (uint256 => address) internal _tokenIdToTokenAddress;
+  mapping (string => address) internal _assetSymbolToAssetToken;
+  mapping (Status => string) internal _statusToTokenURI;
 
   bool internal _paused;
 
@@ -69,6 +87,103 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
 
   function getCreatorAnnuityPercent() external view virtual override returns (uint256) {
     return _farmCreatorAnnuityPercent;
+  }
+
+  // TODO - figure out how to make TokenURI dynamic
+  // function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+  //   require(_exists(tokenId), "ERC721:E-405");
+  //   Status tokenStatus = getStatus(tokenId);
+  //   return _statusToTokenURI[tokenStatus];
+  // }
+
+  function tokenURI2(uint256 tokenId) external virtual override returns (string memory) {
+    require(_exists(tokenId), "ERC721:E-405");
+    Status tokenStatus = getStatus(tokenId);
+    return _statusToTokenURI[tokenStatus];
+  }
+
+  function getParticleMassAaveDai(uint256 tokenId) public virtual returns (uint256) {
+    return _getBaseParticleMass(
+      _tokenIdToTokenAddress[tokenId], 
+      tokenId, 
+      "aave", 
+      _assetSymbolToAssetToken["dai"]
+    );
+  }
+
+  function getParticleMassAaveUni(uint256 tokenId) public virtual returns (uint256) {
+    return _getBaseParticleMass(
+      _tokenIdToTokenAddress[tokenId], 
+      tokenId, 
+      "aave", 
+      _assetSymbolToAssetToken["uni"]
+    );
+  }
+
+  function getParticleMassAaveUsdt(uint256 tokenId) public virtual returns (uint256) {
+    return _getBaseParticleMass(
+      _tokenIdToTokenAddress[tokenId], 
+      tokenId, 
+      "aave", 
+      _assetSymbolToAssetToken["usdt"]
+    );
+  }
+
+  function getChargeAaveDai(uint256 tokenId) public virtual returns (uint256) {
+    return _getCurrentParticleCharge(
+      _tokenIdToTokenAddress[tokenId], 
+      tokenId, 
+      "aave", 
+      _assetSymbolToAssetToken["dai"]
+    );
+  }
+
+  function getChargeAaveUni(uint256 tokenId) public virtual returns (uint256) {
+    return _getCurrentParticleCharge(
+      _tokenIdToTokenAddress[tokenId], 
+      tokenId, 
+      "aave", 
+      _assetSymbolToAssetToken["uni"]
+    );
+  }
+
+  function getChargeAaveUsdt(uint256 tokenId) public virtual returns (uint256) {
+    return _getCurrentParticleCharge(
+      _tokenIdToTokenAddress[tokenId], 
+      tokenId, 
+      "aave", 
+      _assetSymbolToAssetToken["usdt"]
+    );
+  }
+
+  function getStatus(uint256 tokenId) public virtual returns (Status) {
+    uint256 baseDai = getParticleMassAaveDai(tokenId);
+    uint256 baseUni = getParticleMassAaveUni(tokenId);
+    uint256 baseUsdt = getParticleMassAaveUsdt(tokenId);
+
+    if ((baseDai + baseUni + baseUsdt) == 0) {
+      return Status.Empty;
+    }
+
+    uint256 chargeDai = getChargeAaveDai(tokenId);
+    uint256 chargeUni = getChargeAaveUni(tokenId);
+    uint256 chargeUsdt = getChargeAaveUsdt(tokenId);
+
+    if (chargeDai > FULL_CHARGE_THRESHOLD) {
+      return Status.FullDai;
+    } else if (chargeUni > FULL_CHARGE_THRESHOLD) {
+      return Status.FullUni;
+    } else if (chargeUsdt > FULL_CHARGE_THRESHOLD) {
+      return Status.FullUsdt;
+    } else if (chargeDai > HALF_CHARGE_THRESHOLD) {
+      return Status.HalfDai;
+    } else if (chargeUni > HALF_CHARGE_THRESHOLD) {
+      return Status.HalfUni;
+    } else if (chargeUsdt > HALF_CHARGE_THRESHOLD) {
+      return Status.HalfUsdt;
+    }
+    
+    return Status.Planted;
   }
 
   function createEmptyField(
@@ -116,6 +231,7 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     override
     nonReentrant
     whenNotPaused
+    onlyTokenOwnerOrApproved(tokenId)
   {
     return _plantCrops(
       tokenId,
@@ -123,6 +239,22 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
       assetToken,
       assetAmount
     );
+  }
+
+  function harvest(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken
+  )
+    external
+    virtual
+    override
+    nonReentrant
+    whenNotPaused
+    onlyTokenOwnerOrApproved(tokenId)
+    returns (uint256 creatorAmount, uint256 receiverAmount) 
+  {
+    return _harvest(tokenId, walletManagerId, assetToken);
   }
 
   function setSalePrice(uint256 tokenId, uint256 salePrice)
@@ -173,6 +305,38 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     emit ChargedSettingsSet(settings);
   }
 
+  /// @dev Setup the Asset Token Map
+  function setAssetTokenMap(address daiToken, address uniToken, address usdtToken) external virtual onlyOwner {
+    _assetSymbolToAssetToken["dai"] = daiToken;
+    _assetSymbolToAssetToken["uni"] = uniToken;
+    _assetSymbolToAssetToken["usdt"] = usdtToken;
+  }
+
+  /// @dev Setup the Status to tokenURI Map
+  function setStatusToTokenURIMap(
+    string memory emptyUri, 
+    string memory plantedUri, 
+    string memory halfDaiUri, 
+    string memory halfUniUri, 
+    string memory halfUsdtUri, 
+    string memory fullDaiUri, 
+    string memory fullUniUri, 
+    string memory fullUsdtUri
+  ) 
+    external 
+    virtual 
+    onlyOwner 
+  {
+    _statusToTokenURI[Status.Empty] = emptyUri;
+    _statusToTokenURI[Status.Planted] = plantedUri;
+    _statusToTokenURI[Status.HalfDai] = halfDaiUri;
+    _statusToTokenURI[Status.HalfUni] = halfUniUri;
+    _statusToTokenURI[Status.HalfUsdt] = halfUsdtUri;
+    _statusToTokenURI[Status.FullDai] = fullDaiUri;
+    _statusToTokenURI[Status.FullUni] = fullUniUri;
+    _statusToTokenURI[Status.FullUsdt] = fullUsdtUri;
+  }
+
   /***********************************|
   |          Only Admin/DAO           |
   |      (blackhole prevention)       |
@@ -194,6 +358,38 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   /***********************************|
   |         Private Functions         |
   |__________________________________*/
+
+  function _getBaseParticleMass(
+    address contractAddress,
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken
+  ) 
+    internal 
+    virtual
+    returns (uint256)
+  {
+    if (address(_chargedParticles) == address(0x0))
+      return 0;
+
+    return _chargedParticles.baseParticleMass(contractAddress, tokenId, walletManagerId, assetToken);
+  }
+  
+  function _getCurrentParticleCharge(
+    address contractAddress,
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken
+  ) 
+    internal 
+    virtual
+    returns (uint256)
+  {
+    if (address(_chargedParticles) == address(0x0))
+      return 0;
+
+    return _chargedParticles.currentParticleCharge(contractAddress, tokenId, walletManagerId, assetToken);
+  }
 
   function _setSalePrice(uint256 tokenId, uint256 salePrice) internal virtual {
     // Temp-Lock/Unlock NFT
@@ -220,6 +416,7 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
 
     newTokenId = _tokenIds.current();
     _safeMint(receiver, newTokenId, "");
+    _tokenIdToTokenAddress[newTokenId] = address(this);
 
     _setTokenURI(newTokenId, tokenMetaUri);  // TODO
 
@@ -266,7 +463,39 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
       walletManagerId,
       assetToken,
       assetAmount,
-      address(0)  // blackhole
+      address(0x0)  // blackhole (arg not used)
+    );
+  }
+
+  function _harvest(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken
+  )
+    internal
+    virtual
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    require(address(_chargedParticles) != address(0x0), "PRT:E-107");
+
+    _dischargeParticle(tokenId, walletManagerId, assetToken);
+  }
+
+  function _dischargeParticle(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken
+  )
+    internal
+    virtual
+    returns (uint256 creatorAmount, uint256 receiverAmount)
+  {
+    return _chargedParticles.dischargeParticle(
+      _msgSender(),
+      address(this),
+      tokenId,
+      walletManagerId,
+      assetToken
     );
   }
 

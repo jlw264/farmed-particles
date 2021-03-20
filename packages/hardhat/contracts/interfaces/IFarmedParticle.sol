@@ -59,19 +59,10 @@ interface IFarmedParticle is IERC721 {
   function getLastSellPrice(uint256 tokenId) external view returns (uint256);
   function getCreatorAnnuityPercent() external view returns (uint256);
 
+  function tokenURI2(uint256 tokenId) external returns (string memory);
+
   // modeled off of buyProton
   function buyField(uint256 tokenId) external payable returns (bool);
-
-  // function createChargedParticle(
-  //   address creator,
-  //   address receiver,
-  //   address referrer,
-  //   string memory tokenMetaUri,
-  //   string memory walletManagerId,
-  //   address assetToken,
-  //   uint256 assetAmount,
-  //   uint256 annuityPercent
-  // ) external returns (uint256 newTokenId);
 
   // modeled off of createProton
   function createEmptyField(
@@ -90,6 +81,12 @@ interface IFarmedParticle is IERC721 {
     address assetToken,
     uint256 assetAmount
   ) external;
+
+  function harvest(
+    uint256 tokenId,
+    string memory walletManagerId,
+    address assetToken
+  ) external returns (uint256 creatorAmount, uint256 receiverAmount);
 
   function setSalePrice(uint256 tokenId, uint256 salePrice) external;
 }
