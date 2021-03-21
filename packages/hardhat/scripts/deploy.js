@@ -36,7 +36,7 @@ const main = async () => {
   // setChargedState - kovan: 0xD63423049022bd77C530aD6f293Bc4209A6d565B
   // setAssetTokenMap:
   //   dai: 0xff795577d9ac8bd7d90ee22b6c1703490b6512fd
-  //   uni: 0x075a36ba8846c6b6f53644fdd3bf17e5151789dc10
+  //   uni: 0x075a36ba8846c6b6f53644fdd3bf17e5151789dc
   //   usdc: 0xe22da380ee6b445bb8273c81944adeb6e8450422
   // setStatusToTokenURIMap
   //   emptyUri: https://ipfs.io/ipfs/bafkreichleu2uxowpv657abpzw7rhx3dziz5affbdwek2rywowgvxh6owm

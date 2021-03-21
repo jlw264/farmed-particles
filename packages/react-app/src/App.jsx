@@ -16,7 +16,7 @@ import { utils } from "ethers";
 //import Hints from "./Hints";
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { useThemeSwitcher } from "react-css-theme-switcher";
-import { INFURA_ID, DAI_ADDRESS, DAI_ABI, FARMED_PARTICLE_ADDRESS, FARMED_PARTICLE_ABI, NETWORK, NETWORKS } from "./constants";
+import { INFURA_ID, DAI_ADDRESS, DAI_ADDRESS_KOVAN, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 import StackGrid from "react-stack-grid";
 import ReactJson from 'react-json-view'
 import assets from './assets.js'
@@ -85,6 +85,12 @@ const getFromIPFS = async hashToGet => {
     // console.log(content)
     return content
   }
+}
+
+const getHumanReadableStatus = (statusId) => {
+  if (statusId == 0)
+    return "Empty"
+  return "Planted"
 }
 
 // 🛰 providers
@@ -161,11 +167,15 @@ function App(props) {
   // If you want to bring in the mainnet DAI contract it would look like:
   const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI)
   // console.log("🌍 DAI contract on mainnet:",mainnetDAIContract)
+  const kovanDAIContract = useExternalContractLoader(userProvider, DAI_ADDRESS_KOVAN, DAI_ABI)
+  console.log("🌍 DAI contract on kovan:",kovanDAIContract)
+
   //
   // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0x34aA3F359A9D614239015126635CE7732c18fDF3"])
+  const myMainnetDAIBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0xBC8f1423b7b0abF63A2259276e2a205b2cD8fC61"])
   // console.log("🥇 myMainnetDAIBalance:",myMainnetDAIBalance)
-
+  const myKovanDAIBalance = useContractReader({DAI: kovanDAIContract},"DAI", "balanceOf",["0xBC8f1423b7b0abF63A2259276e2a205b2cD8fC61"])
+  console.log("🥇 myKovanDAIBalance:",myKovanDAIBalance)
 
   // keep track of a variable from the contract in the local React state:
   const balance = useContractReader(readContracts,"FarmedParticle", "balanceOf", [ address ])
@@ -312,7 +322,7 @@ function App(props) {
         <div>
           <Button onClick={()=>{
             console.log("gasPrice,",gasPrice)
-            tx( writeContracts.FarmedParticle.createEmptyField(address, "https://ipfs.io/ipfs/bafkreichleu2uxowpv657abpzw7rhx3dziz5affbdwek2rywowgvxh6owm",{gasPrice:gasPrice}) )
+            tx( writeContracts.FarmedParticle.createEmptyField(address,{gasPrice:gasPrice}) )
           }}>
             Buy Field
           </Button>
@@ -359,7 +369,7 @@ function App(props) {
 
         <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
-            <Link onClick={()=>{setRoute("/")}} to="/">Your Farm</Link>
+            <Link onClick={()=>{setRoute("/")}} to="/">My Farm</Link>
           </Menu.Item>
           <Menu.Item key="/availablefields">
             <Link onClick={()=>{setRoute("/availablefields")}} to="/availablefields">Available Fields</Link>
@@ -374,7 +384,7 @@ function App(props) {
             <Link onClick={()=>{setRoute("/ipfsdown")}} to="/ipfsdown">IPFS Download</Link>
           </Menu.Item> */}
           <Menu.Item key="/debugcontracts">
-            <Link onClick={()=>{setRoute("/debugcontracts")}} to="/debugcontracts">Debug Contracts</Link>
+            <Link onClick={()=>{setRoute("/debugcontracts")}} to="/debugcontracts">Contract</Link>
           </Menu.Item>
         </Menu>
 
@@ -386,6 +396,7 @@ function App(props) {
                 dataSource={farmedParticles}
                 renderItem={(item) => {
                   const id = item.id.toNumber()
+                  const status = getHumanReadableStatus(item.status)
                   return (
                     <List.Item key={id+"_"+item.uri+"_"+item.owner}>
                       <Card title={(
@@ -398,12 +409,22 @@ function App(props) {
                       </Card>
 
                       <div>
-                        <Button onClick={()=>{
-                          console.log("writeContracts - update status",writeContracts)
-                          tx( writeContracts.FarmedParticle.getStatus(id) )
-                        }}>
-                          Refresh Status
-                        </Button>
+                        <div>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - update status",writeContracts)
+                            tx( writeContracts.FarmedParticle.refreshStatus(item.id) )
+                          }}>
+                            Refresh Status
+                          </Button>
+                        </div>
+                        <div>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - approve dai",writeContracts)
+                            tx( kovanDAIContract.approve("0x9C97e093A01061C7FDc7ED6c1eeCA0C20C3d294F", 1000000000) )
+                          }}>
+                            Approve DAI
+                          </Button>
+                        </div>
                       </div>
 
                       <div>
