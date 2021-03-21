@@ -16,7 +16,7 @@ import { utils } from "ethers";
 //import Hints from "./Hints";
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { useThemeSwitcher } from "react-css-theme-switcher";
-import { INFURA_ID, DAI_ADDRESS, DAI_ADDRESS_KOVAN, DAI_ABI, NETWORK, NETWORKS } from "./constants";
+import { INFURA_ID, DAI_ADDRESS, DAI_ADDRESS_KOVAN, UNI_ADDRESS_KOVAN, USDC_ADDRESS_KOVAN, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 import StackGrid from "react-stack-grid";
 import ReactJson from 'react-json-view'
 import assets from './assets.js'
@@ -85,12 +85,6 @@ const getFromIPFS = async hashToGet => {
     // console.log(content)
     return content
   }
-}
-
-const getHumanReadableStatus = (statusId) => {
-  if (statusId == 0)
-    return "Empty"
-  return "Planted"
 }
 
 // 🛰 providers
@@ -169,13 +163,17 @@ function App(props) {
   // console.log("🌍 DAI contract on mainnet:",mainnetDAIContract)
   const kovanDAIContract = useExternalContractLoader(userProvider, DAI_ADDRESS_KOVAN, DAI_ABI)
   console.log("🌍 DAI contract on kovan:",kovanDAIContract)
+  const kovanUNIContract = useExternalContractLoader(userProvider, UNI_ADDRESS_KOVAN, DAI_ABI)
+  console.log("🌍 UNI contract on kovan:",kovanUNIContract)
+  const kovanUSDCContract = useExternalContractLoader(userProvider, USDC_ADDRESS_KOVAN, DAI_ABI)
+  console.log("🌍 USDC contract on kovan:",kovanUSDCContract)
 
   //
   // Then read your DAI balance like:
   const myMainnetDAIBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0xBC8f1423b7b0abF63A2259276e2a205b2cD8fC61"])
   // console.log("🥇 myMainnetDAIBalance:",myMainnetDAIBalance)
   const myKovanDAIBalance = useContractReader({DAI: kovanDAIContract},"DAI", "balanceOf",["0xBC8f1423b7b0abF63A2259276e2a205b2cD8fC61"])
-  console.log("🥇 myKovanDAIBalance:",myKovanDAIBalance)
+  // console.log("🥇 myKovanDAIBalance:",myKovanDAIBalance)
 
   // keep track of a variable from the contract in the local React state:
   const balance = useContractReader(readContracts,"FarmedParticle", "balanceOf", [ address ])
@@ -390,13 +388,12 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
-            <div style={{ width:800, margin: "auto", marginTop:32, paddingBottom:32 }}>
+            <div style={{ width:1000, margin: "auto", marginTop:32, paddingBottom:32 }}>
               <List
                 bordered
                 dataSource={farmedParticles}
                 renderItem={(item) => {
                   const id = item.id.toNumber()
-                  const status = getHumanReadableStatus(item.status)
                   return (
                     <List.Item key={id+"_"+item.uri+"_"+item.owner}>
                       <Card title={(
@@ -404,7 +401,7 @@ function App(props) {
                           <span style={{fontSize:16, marginRight:8}}>#{id}</span> {item.name}
                         </div>
                       )}>
-                        <div><img src={item.image} style={{maxWidth:150}} /></div>
+                        <div><img src={item.image} style={{width:250}} /></div>
                         <div>{item.description}</div>
                       </Card>
 
@@ -420,9 +417,61 @@ function App(props) {
                         <div>
                           <Button onClick={()=>{
                             console.log("writeContracts - approve dai",writeContracts)
-                            tx( kovanDAIContract.approve("0x9C97e093A01061C7FDc7ED6c1eeCA0C20C3d294F", 1000000000) )
+                            tx( kovanDAIContract.approve("0x9C97e093A01061C7FDc7ED6c1eeCA0C20C3d294F", utils.parseEther('1000')) )
                           }}>
                             Approve DAI
+                          </Button>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - plant dai",writeContracts)
+                            tx( writeContracts.FarmedParticle.plantCrops(item.id, "aave", DAI_ADDRESS_KOVAN, utils.parseEther('1000')) )
+                          }}>
+                            Plant DAI
+                          </Button>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - harvest dai",writeContracts)
+                            tx( writeContracts.FarmedParticle.harvest(item.id, "aave", DAI_ADDRESS_KOVAN) )
+                          }}>
+                            Harvest DAI
+                          </Button>
+                        </div>
+                        <div>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - approve uni",writeContracts)
+                            tx( kovanUNIContract.approve("0x9C97e093A01061C7FDc7ED6c1eeCA0C20C3d294F", utils.parseEther('100')) )
+                          }}>
+                            Approve UNI
+                          </Button>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - plant uni",writeContracts)
+                            tx( writeContracts.FarmedParticle.plantCrops(item.id, "aave", UNI_ADDRESS_KOVAN, utils.parseEther('100')) )
+                          }}>
+                            Plant UNI
+                          </Button>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - harvest uni",writeContracts)
+                            tx( writeContracts.FarmedParticle.harvest(item.id, "aave", UNI_ADDRESS_KOVAN) )
+                          }}>
+                            Harvest DAI
+                          </Button>
+                        </div>
+                        <div>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - approve usdc",writeContracts)
+                            tx( kovanUSDCContract.approve("0x9C97e093A01061C7FDc7ED6c1eeCA0C20C3d294F", utils.parseEther('1000')) )
+                          }}>
+                            Approve USDC
+                          </Button>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - plant usdc",writeContracts)
+                            tx( writeContracts.FarmedParticle.plantCrops(item.id, "aave", USDC_ADDRESS_KOVAN, utils.parseEther('1000')) )
+                          }}>
+                            Plant USDC
+                          </Button>
+                          <Button onClick={()=>{
+                            console.log("writeContracts - harvest usdc",writeContracts)
+                            tx( writeContracts.FarmedParticle.harvest(item.id, "aave", USDC_ADDRESS_KOVAN) )
+                          }}>
+                            Harvest USDC
                           </Button>
                         </div>
                       </div>
