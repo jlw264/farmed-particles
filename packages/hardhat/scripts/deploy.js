@@ -21,8 +21,8 @@ const main = async () => {
   }
   console.log(" \n")
 
-  const creatorAddressKovan = "0x3a5098C1dce83D2DAe00719f63e17e6447a13023";
-  const creatorAnnuity = 5;
+  const creatorAddressKovan = "0xBC8f1423b7b0abF63A2259276e2a205b2cD8fC61";
+  const creatorAnnuity = 500; //5%
 
   // deploy the contract with all the artworks forSale
   // const yourCollectible = await deploy("YourCollectible",[ bytes32Array ]) // <-- add in constructor args like line 19 vvvv
@@ -36,7 +36,7 @@ const main = async () => {
   // setChargedState - kovan: 0xD63423049022bd77C530aD6f293Bc4209A6d565B
   // setAssetTokenMap:
   //   dai: 0xff795577d9ac8bd7d90ee22b6c1703490b6512fd
-  //   uni: 0x075a36ba8846c6b6f53644fdd3bf17e5151789dc
+  //   uni: 0x075a36ba8846c6b6f53644fdd3bf17e5151789dc10
   //   usdc: 0xe22da380ee6b445bb8273c81944adeb6e8450422
   // setStatusToTokenURIMap
   //   emptyUri: https://ipfs.io/ipfs/bafkreichleu2uxowpv657abpzw7rhx3dziz5affbdwek2rywowgvxh6owm

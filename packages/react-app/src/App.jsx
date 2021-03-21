@@ -16,7 +16,7 @@ import { utils } from "ethers";
 //import Hints from "./Hints";
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { useThemeSwitcher } from "react-css-theme-switcher";
-import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
+import { INFURA_ID, DAI_ADDRESS, DAI_ABI, FARMED_PARTICLE_ADDRESS, FARMED_PARTICLE_ABI, NETWORK, NETWORKS } from "./constants";
 import StackGrid from "react-stack-grid";
 import ReactJson from 'react-json-view'
 import assets from './assets.js'
@@ -26,7 +26,7 @@ const { BufferList } = require('bl')
 const ipfsAPI = require('ipfs-http-client');
 const ipfs = ipfsAPI({host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 
-console.log("📦 Assets: ",assets)
+// console.log("📦 Assets: ",assets)
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -49,10 +49,10 @@ console.log("📦 Assets: ",assets)
 
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS['localhost']; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS['kovan']; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = true
+const DEBUG = false
 
 //EXAMPLE STARTING JSON:
 const STARTING_JSON = {
@@ -76,19 +76,19 @@ const STARTING_JSON = {
 // you usually go content.toString() after this...
 const getFromIPFS = async hashToGet => {
   for await (const file of ipfs.get(hashToGet)) {
-    console.log(file.path)
+    // console.log(file.path)
     if (!file.content) continue;
     const content = new BufferList()
     for await (const chunk of file.content) {
       content.append(chunk)
     }
-    console.log(content)
+    // console.log(content)
     return content
   }
 }
 
 // 🛰 providers
-if(DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
+// if(DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
@@ -101,7 +101,7 @@ const mainnetInfura = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFU
 const localProviderUrl = targetNetwork.rpcUrl;
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if(DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
+// if(DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 
 
@@ -112,7 +112,7 @@ const blockExplorer = targetNetwork.blockExplorer;
 function App(props) {
 
   const mainnetProvider = (scaffoldEthProvider && scaffoldEthProvider._network) ? scaffoldEthProvider : mainnetInfura
-  if(DEBUG) console.log("🌎 mainnetProvider",mainnetProvider)
+  // if(DEBUG) console.log("🌎 mainnetProvider",mainnetProvider)
 
   const [injectedProvider, setInjectedProvider] = useState();
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
@@ -123,14 +123,14 @@ function App(props) {
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   const address = useUserAddress(userProvider);
-  if(DEBUG) console.log("👩‍💼 selected address:",address)
+  // if(DEBUG) console.log("👩‍💼 selected address:",address)
 
   // You can warn the user if you would like them to be on a specific network
   let localChainId = localProvider && localProvider._network && localProvider._network.chainId
-  if(DEBUG) console.log("🏠 localChainId",localChainId)
+  // if(DEBUG) console.log("🏠 localChainId",localChainId)
 
   let selectedChainId = userProvider && userProvider._network && userProvider._network.chainId
-  if(DEBUG) console.log("🕵🏻‍♂️ selectedChainId:",selectedChainId)
+  // if(DEBUG) console.log("🕵🏻‍♂️ selectedChainId:",selectedChainId)
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
@@ -142,40 +142,38 @@ function App(props) {
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
-  if(DEBUG) console.log("💵 yourLocalBalance",yourLocalBalance?formatEther(yourLocalBalance):"...")
+  // if(DEBUG) console.log("💵 yourLocalBalance",yourLocalBalance?formatEther(yourLocalBalance):"...")
 
   // Just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
-  if(DEBUG) console.log("💵 yourMainnetBalance",yourMainnetBalance?formatEther(yourMainnetBalance):"...")
+  // if(DEBUG) console.log("💵 yourMainnetBalance",yourMainnetBalance?formatEther(yourMainnetBalance):"...")
 
   // Load in your local 📝 contract and read a value from it:
   const readContracts = useContractLoader(localProvider)
-  if(DEBUG) console.log("📝 readContracts",readContracts)
+  // if(DEBUG) console.log("📝 readContracts",readContracts)
 
   // If you want to make 🔐 write transactions to your contracts, use the userProvider:
   const writeContracts = useContractLoader(userProvider)
-  if(DEBUG) console.log("🔐 writeContracts",writeContracts)
+  // if(DEBUG) console.log("🔐 writeContracts",writeContracts)
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
   // If you want to bring in the mainnet DAI contract it would look like:
   const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI)
-  console.log("🌍 DAI contract on mainnet:",mainnetDAIContract)
+  // console.log("🌍 DAI contract on mainnet:",mainnetDAIContract)
   //
   // Then read your DAI balance like:
   const myMainnetDAIBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0x34aA3F359A9D614239015126635CE7732c18fDF3"])
-  console.log("🥇 myMainnetDAIBalance:",myMainnetDAIBalance)
+  // console.log("🥇 myMainnetDAIBalance:",myMainnetDAIBalance)
 
 
   // keep track of a variable from the contract in the local React state:
   const balance = useContractReader(readContracts,"FarmedParticle", "balanceOf", [ address ])
-  console.log("🤗 balance:",balance)
+  // console.log("🤗 balance:",balance)
 
   //📟 Listen for broadcast events
   const transferEvents = useEventListener(readContracts, "FarmedParticle", "Transfer", localProvider, 1);
-  console.log("📟 Transfer events:",transferEvents)
-
-
+  // console.log("📟 Transfer events:",transferEvents)
 
   //
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
@@ -211,11 +209,6 @@ function App(props) {
     }
     updateFarmedParticles()
   },[ address, yourBalance ])
-
-  /*
-  const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
-  */
 
 
   let networkDisplay = ""
@@ -311,7 +304,7 @@ function App(props) {
 
   let galleryList = []
   for(let a in loadedAssets){
-    console.log("loadedAssets",a,loadedAssets[a])
+    //console.log("loadedAssets",a,loadedAssets[a])
 
     let cardActions = []
     // if(loadedAssets[a].forSale){
@@ -319,7 +312,7 @@ function App(props) {
         <div>
           <Button onClick={()=>{
             console.log("gasPrice,",gasPrice)
-            tx( writeContracts.FarmedParticle.mintItem(loadedAssets[a].id,{gasPrice:gasPrice}) )
+            tx( writeContracts.FarmedParticle.createEmptyField(address, "https://ipfs.io/ipfs/bafkreichleu2uxowpv657abpzw7rhx3dziz5affbdwek2rywowgvxh6owm",{gasPrice:gasPrice}) )
           }}>
             Buy Field
           </Button>
@@ -387,7 +380,7 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
-            <div style={{ width:2000, margin: "auto", marginTop:32, paddingBottom:32 }}>
+            <div style={{ width:800, margin: "auto", marginTop:32, paddingBottom:32 }}>
               <List
                 bordered
                 dataSource={farmedParticles}
@@ -403,6 +396,15 @@ function App(props) {
                         <div><img src={item.image} style={{maxWidth:150}} /></div>
                         <div>{item.description}</div>
                       </Card>
+
+                      <div>
+                        <Button onClick={()=>{
+                          console.log("writeContracts - update status",writeContracts)
+                          tx( writeContracts.FarmedParticle.getStatus(id) )
+                        }}>
+                          Refresh Status
+                        </Button>
+                      </div>
 
                       <div>
                         owner: <Address
@@ -573,7 +575,7 @@ function App(props) {
       </div>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
          <Row align="middle" gutter={[4, 4]}>
            <Col span={8}>
              <Ramp price={price} address={address} networks={NETWORKS}/>
@@ -602,15 +604,15 @@ function App(props) {
            <Col span={24}>
              {
                /*  if the local provider has a signer, let's show the faucet:  */
-               faucetAvailable ? (
+               /*faucetAvailable ? (
                  <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider}/>
                ) : (
                  ""
                )
              }
            </Col>
-         </Row>
-       </div>
+            </Row>*/}
+        {/* </div> */}
 
     </div>
   );

@@ -59,15 +59,12 @@ interface IFarmedParticle is IERC721 {
   function getLastSellPrice(uint256 tokenId) external view returns (uint256);
   function getCreatorAnnuityPercent() external view returns (uint256);
 
-  function tokenURI2(uint256 tokenId) external returns (string memory);
-
   // modeled off of buyProton
   function buyField(uint256 tokenId) external payable returns (bool);
 
   // modeled off of createProton
   function createEmptyField(
-    address receiver,
-    string memory tokenMetaUri
+    address receiver
   ) external returns (uint256 newTokenId);
 
 

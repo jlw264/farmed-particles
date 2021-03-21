@@ -25,8 +25,8 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   using Address for address payable;
   using Counters for Counters.Counter;
 
-  uint256 internal _fullHarvestThreshold = 2;
-  uint256 internal _halfHarvestThreshold = 1;
+  uint256 internal _fullHarvestThreshold = 200;
+  uint256 internal _halfHarvestThreshold = 100;
 
   enum Status {
     Empty,
@@ -54,6 +54,8 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   
   mapping (uint256 => address) internal _tokenIdToTokenAddress;
   mapping (string => address) internal _assetSymbolToAssetToken;
+
+  mapping (uint256 => Status) internal _tokenIdToStatus;
   mapping (Status => string) internal _statusToTokenURI;
 
   bool internal _paused;
@@ -97,17 +99,8 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     return _halfHarvestThreshold;
   }
 
-  // TODO - figure out how to make TokenURI dynamic
-  // function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-  //   require(_exists(tokenId), "ERC721:E-405");
-  //   Status tokenStatus = getStatus(tokenId);
-  //   return _statusToTokenURI[tokenStatus];
-  // }
-
-  function tokenURI2(uint256 tokenId) external virtual override returns (string memory) {
-    require(_exists(tokenId), "ERC721:E-405");
-    Status tokenStatus = getStatus(tokenId);
-    return _statusToTokenURI[tokenStatus];
+  function getStatus(uint256 tokenId) external view virtual returns (Status) {
+    return _tokenIdToStatus[tokenId];
   }
 
   function getParticleMassAaveDai(uint256 tokenId) public virtual returns (uint256) {
@@ -164,13 +157,14 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     );
   }
 
-  function getStatus(uint256 tokenId) public virtual returns (Status) {
+  function refreshStatus(uint256 tokenId) external virtual {
     uint256 baseDai = getParticleMassAaveDai(tokenId);
     uint256 baseUni = getParticleMassAaveUni(tokenId);
     uint256 baseUsdc = getParticleMassAaveUsdc(tokenId);
 
     if ((baseDai + baseUni + baseUsdc) == 0) {
-      return Status.Empty;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.Empty]);
+      return;
     }
 
     uint256 chargeDai = getChargeAaveDai(tokenId);
@@ -178,25 +172,30 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     uint256 chargeUsdc = getChargeAaveUsdc(tokenId);
 
     if (chargeDai > _fullHarvestThreshold) {
-      return Status.FullDai;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.FullDai]);
+      return;
     } else if (chargeUni > _fullHarvestThreshold) {
-      return Status.FullUni;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.FullUni]);
+      return;
     } else if (chargeUsdc > _fullHarvestThreshold) {
-      return Status.FullUsdc;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.FullUsdc]);
+      return;
     } else if (chargeDai > _halfHarvestThreshold) {
-      return Status.HalfDai;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.HalfDai]);
+      return;
     } else if (chargeUni > _halfHarvestThreshold) {
-      return Status.HalfUni;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.HalfUni]);
+      return;
     } else if (chargeUsdc > _halfHarvestThreshold) {
-      return Status.HalfUsdc;
+      _setTokenURI(tokenId, _statusToTokenURI[Status.HalfUsdc]);
+      return;
     }
     
-    return Status.Planted;
+    _setTokenURI(tokenId, _statusToTokenURI[Status.Planted]);
   }
 
   function createEmptyField(
-    address receiver,
-    string memory tokenMetaUri
+    address receiver
   )
     external
     virtual
@@ -207,7 +206,6 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     newTokenId = _createEmptyField(
       _farmCreator,
       receiver,
-      tokenMetaUri,
       _farmCreatorAnnuityPercent
     );
   }
@@ -420,7 +418,6 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
   function _createEmptyField(
     address creator,
     address receiver,
-    string memory tokenMetaUri,
     uint256 annuityPercent
   )
     internal
@@ -435,7 +432,7 @@ contract FarmedParticle is IFarmedParticle, ERC721, Ownable, RelayRecipient, Ree
     _safeMint(receiver, newTokenId, "");
     _tokenIdToTokenAddress[newTokenId] = address(this);
 
-    _setTokenURI(newTokenId, tokenMetaUri);  // TODO
+    _setTokenURI(newTokenId, _statusToTokenURI[Status.Empty]);
 
     if (annuityPercent > 0) {
       _chargedSettings.setCreatorAnnuities(
